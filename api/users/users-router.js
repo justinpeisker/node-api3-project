@@ -1,12 +1,12 @@
 const express = require('express');
-const User = require('./users-model')
-const Post = require('../posts/posts-model')
-
 const {
   validateUserId,
   validateUser,
   validatePost,
 } = require('../middleware/middleware')
+
+const User = require('./users-model')
+const Post = require('../posts/posts-model')
 
 const router = express.Router();
 
@@ -50,7 +50,7 @@ router.delete('/:id', validateUserId, async (req, res, next) => {
  }
 });
 
-router.get('/:id/posts', validateUserId, async (req, res) => {
+router.get('/:id/posts', validateUserId, async (req, res, next) => {
   try{
     const result = await User.getUserPosts(req.params.id)
     res.json(result)
@@ -59,12 +59,13 @@ router.get('/:id/posts', validateUserId, async (req, res) => {
    }
 });
 
-router.post('/:id/posts', validateUserId, validatePost,async (req, res) => {
+router.post('/:id/posts', validateUserId, validatePost,async (req, res, next) => {
   try{
     const result = await Post.insert({
       user_id: req.params.id,
       text: req.text,
     })
+    res.status(201).json(result)
   }catch (err) {
     next(err)
   }
